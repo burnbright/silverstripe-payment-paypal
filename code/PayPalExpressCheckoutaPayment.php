@@ -68,20 +68,28 @@ class PayPalExpressCheckoutPayment extends Payment{
 	//main processing function
 	function processPayment($data, $form) {
 		
-		//TODO: sanity checks for credentials
-		//if($this->getUsername() || $this->getPassword || $this->getSignature())
-			//user_error('You are attempting to make a test/live payment without the needed credentials set','...');
+		//sanity checks for credentials
+		if(!self::$API_UserName || !self::$API_Password || !self::$API_Signature){
+			user_error('You are attempting to make a payment without the necessary credentials set', E_USER_ERROR);
+		}
 		
 		$paymenturl = $this->getTokenURL($this->Amount->Amount,$this->Amount->Currency);
 		
 		$this->Status = "Pending";
 		$this->write();
 		
-		Director::redirect($paymenturl); //redirect to payment gateway
-		return new Payment_Processing();
+		if($paymenturl){
+			Director::redirect($paymenturl); //redirect to payment gateway
+			return new Payment_Processing();
+		}
 		
-		//TODO: or fail if PayPal can't be reached
+		$this->Message = "PayPal could not be contacted";
+		$this->Status = 'Failure';
+		$this->write();
+		
+		return new Payment_Failure($this->Message);
 	}
+	
 	
 	protected function getTokenURL($paymentAmount, $currencyCodeType, $paymentType = "Sale"){
 
