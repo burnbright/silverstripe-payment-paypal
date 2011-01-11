@@ -196,8 +196,6 @@ class PayPalExpressCheckoutPayment extends Payment{
 
 		$response = $this->apiCall('SetExpressCheckout',$data);
 		
-		//TODO: check for success message: "SUCCESS" || "SUCCESSWITHWARNING"
-		//else return null;
 		if(!isset($response['ACK']) ||  !(strtoupper($response['ACK']) == "SUCCESS" || strtoupper($response['ACK']) == "SUCCESSWITHWARNING")){
 			return null;
 		}
@@ -312,7 +310,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 				return "eCheck has not cleared.";
 			case "intl":
 				return "International: payment must be accepted or denied manually.";
-			case "multi-currency":
+			case "multicurrency":
 				return "Multi-currency: payment must be accepted or denied manually.";
 			case "order":
 			case "paymentreview":
