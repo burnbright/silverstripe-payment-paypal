@@ -7,6 +7,9 @@
  * which can be set up by following this guide:
  * https://developer.paypal.com/en_US/pdf/PP_Sandbox_UserGuide.pdf
  * 
+ * Integration guide for development:
+ * https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_ExpressCheckout_IntegrationGuide.pdf
+ * 
  * API reference: https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/howto_api_reference
  * 
  * ..add testing info
@@ -14,7 +17,7 @@
  * 
  */
 
-//TODO: allow direct payments, perhaps extend this class for that
+//TODO: allow customising colours, and locale
 
 class PayPalExpressCheckoutPayment extends Payment{
 	
@@ -98,9 +101,10 @@ class PayPalExpressCheckoutPayment extends Payment{
 			'PAYMENTREQUEST_0_CURRENCYCODE' => $currencyCodeType, //TODO: check to be sure all currency codes match the SS ones
 			'PAYMENTREQUEST_0_PAYMENTACTION' => $paymentType,
 			'RETURNURL' => Director::absoluteURL(self::$returnURL,true),
-			'CANCELURL' => Director::absoluteURL(self::$cancelURL,true)
+			'CANCELURL' => Director::absoluteURL(self::$cancelURL,true),
+			'useraction' => 'commit' //prevents confirmation screen at the end
 			
-			//TODO: add shipping fields, or make it optional
+			//TODO: add member & shipping fields ...this will pre-populate the paypal login / create account form 
 			
 			//'ADDROVERRIDE' => 1,
 			//'PAYMENTREQUEST_0_SHIPTONAME' => $shipToName,
