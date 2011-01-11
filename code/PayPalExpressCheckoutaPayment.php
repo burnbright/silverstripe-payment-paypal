@@ -95,7 +95,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 			user_error('You are attempting to make a payment without the necessary credentials set', E_USER_ERROR);
 		}
 		
-		$paymenturl = $this->getTokenURL($this->Amount->Amount,$this->Amount->Currency);
+		$paymenturl = $this->getTokenURL($this->Amount->Amount,$this->Amount->Currency,$data);
 		
 		$this->Status = "Pending";
 		$this->write();
@@ -121,7 +121,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 	 * Note: some of these values will override the paypal merchant account settings.
 	 * Note: not all fields are listed here.
 	 */	
-	protected function getTokenURL($paymentAmount, $currencyCodeType){
+	protected function getTokenURL($paymentAmount, $currencyCodeType, $extradata = array()){
 		
 		$data = array(
 			//payment info
@@ -150,18 +150,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 			 
 			//'CALLBACK'
 			//'CALLBACKTIMEOUT'
-			
-			//TODO: add member & shipping fields ...this will pre-populate the paypal login / create account form 
-			//'EMAIL' => 
-			//'PAYMENTREQUEST_0_SHIPTONAME' => $shipToName,
-			//'PAYMENTREQUEST_0_SHIPTOSTREET' => $shipToStreet,
-			//'PAYMENTREQUEST_0_SHIPTOSTREET2' => $shipToStreet2,
-			//'PAYMENTREQUEST_0_SHIPTOCITY' => $shipToCity,
-			//'PAYMENTREQUEST_0_SHIPTOSTATE' => $shipToState,
-			//'PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE' => $shipToCountryCode,
-			//'PAYMENTREQUEST_0_SHIPTOZIP' => $shipToZip,
-			//'PAYMENTREQUEST_0_SHIPTOPHONENUM' => $phoneNum
-			
+						
 			//shipping display
 			//'REQCONFIRMSHIPPING' //require that paypal account address be confirmed
 			'NOSHIPPING' => 1, //show shipping fields, or not 0 = show shipping, 1 = don't show shipping, 2 = use account address, if none passed
@@ -174,6 +163,33 @@ class PayPalExpressCheckoutPayment extends Payment{
 			'LANDINGPAGE' => 'Billing' //can be 'Billing' or 'Login'
 
 		);
+		
+		if(!isset($extradata['Name'])){
+			$arr =  array();
+			if(isset($extradata['FirstName'])) $arr[] = $extradata['FirstName'];
+			if(isset($extradata['MiddleName'])) $arr[] = $extradata['MiddleName'];
+			if(isset($extradata['Surname'])) $arr[] = $extradata['Surname'];
+			
+			$extradata['Name'] = implode(' ',$arr);
+		}
+			
+		
+		//add member & shipping fields ...this will pre-populate the paypal login / create account form
+		foreach(array(
+			'Email' => 'EMAIL',
+			'Name' => 'PAYMENTREQUEST_0_SHIPTONAME',
+			'Address' => 'PAYMENTREQUEST_0_SHIPTOSTREET',
+			'AddressLine2' => 'PAYMENTREQUEST_0_SHIPTOSTREET2',
+			'City' => 'PAYMENTREQUEST_0_SHIPTOCITY',
+			'State' => 'PAYMENTREQUEST_0_SHIPTOSTATE',
+			'PostalCode' => 'PAYMENTREQUEST_0_SHIPTOZIP',
+			'HomePhone' => 'PAYMENTREQUEST_0_SHIPTOPHONENUM',
+			'Country' => 'PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'
+		) as $field => $val){
+			if(isset($extradata[$field])){
+				$data[$val] = $extradata[$field];
+			}			
+		}
 		
 		//set design settings
 		$data = array_merge(self::$customsettings,$data);
@@ -295,9 +311,9 @@ class PayPalExpressCheckoutPayment extends Payment{
 			case "echeck":
 				return "eCheck has not cleared.";
 			case "intl":
-				return "International: must be accepted or denied manually.";
+				return "International: payment must be accepted or denied manually.";
 			case "multi-currency":
-				return "Multi-currency: must be accepted or denied manually.";
+				return "Multi-currency: payment must be accepted or denied manually.";
 			case "order":
 			case "paymentreview":
 			case "unilateral":
