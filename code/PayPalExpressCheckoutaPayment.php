@@ -6,16 +6,14 @@
  * You will need a PayPal sandbox account, along with merchant and customer test accounts,
  * which can be set up by following this guide:
  * https://developer.paypal.com/en_US/pdf/PP_Sandbox_UserGuide.pdf
- *
- * 
- * Integration guide for development:
- * https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_ExpressCheckout_IntegrationGuide.pdf
- * 
- * API reference: https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/howto_api_reference
  * 
  * Notes / Troubleshooting:
  * you must be logged into sandbox to process a test payment.
  * a payment currency must match the currency of the paypal merchant account, or the payment will be set to 'pending'.
+ * 
+ * Developer documentation:
+ * Integration guide: https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_ExpressCheckout_IntegrationGuide.pdf
+ * API reference: 	  https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/howto_api_reference
  * 
  */
 
@@ -54,6 +52,21 @@ class PayPalExpressCheckoutPayment extends Payment{
 	
 	protected static $version = '64';
 	
+	//set custom settings
+	protected static $customsettings = array(
+		//design
+		//'HDRIMG' => "http://www.mysite.com/images/logo.jpg", //max size = 750px wide by 90px high, and good to be on secure server
+		//'HDRBORDERCOLOR' => 'CCCCCC', //header border
+		//'HDRBACKCOLOR' => '00FFFF', //header background
+		//'PAYFLOWCOLOR'=> 'AAAAAA' //payflow colour
+		//'PAGESTYLE' => //page style set in merchant account settings
+		
+		'SOLUTIONTYPE' => 'Sole'//require paypal account, or not. Can be or 'Mark' (required) or 'Sole' (not required)
+		//'BRANDNAME'  => 'my site name'//override business name in checkout
+		//'CUSTOMERSERVICENUMBER' => '0800 1234 5689'//number to call to resolve payment issues
+		//'NOSHIPPING' => 1 //disable showing shipping details
+	);
+	
 	static function set_test_config_details($username,$password,$signature,$sbncode = null){
 		self::$API_UserName = $username;
 		self::$API_Password = $password;
@@ -68,6 +81,10 @@ class PayPalExpressCheckoutPayment extends Payment{
 		self::$API_Signature = $signature;
 		self::$sBNCode = $sbncode;
 		self::$test_mode = false;
+	}
+	
+	static function set_custom_settings(array $design){
+		self::$customsettings = array_merge(self::$customsettings,$design);
 	}
 	
 	//main processing function
@@ -95,19 +112,47 @@ class PayPalExpressCheckoutPayment extends Payment{
 		return new Payment_Failure($this->Message);
 	}
 	
-	
-	protected function getTokenURL($paymentAmount, $currencyCodeType, $paymentType = "Sale"){
 
+	/**
+	 * Requests a Token url, based on the provided Name-Value-Pair fields
+	 * See docs for more detail on these fields:
+	 * https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_nvp_r_SetExpressCheckout
+	 * 
+	 * Note: some of these values will override the paypal merchant account settings.
+	 * Note: not all fields are listed here.
+	 */	
+	protected function getTokenURL($paymentAmount, $currencyCodeType){
+		
 		$data = array(
+			//payment info
 			'PAYMENTREQUEST_0_AMT' => $paymentAmount,
 			'PAYMENTREQUEST_0_CURRENCYCODE' => $currencyCodeType, //TODO: check to be sure all currency codes match the SS ones
-			'PAYMENTREQUEST_0_PAYMENTACTION' => $paymentType,
+
+			//TODO: include individual costs: shipping, shipping discount, insurance, handling, tax??
+			//'PAYMENTREQUEST_0_ITEMAMT' => //item(s)
+			//'PAYMENTREQUEST_0_SHIPPINGAMT' //shipping
+			//'PAYMENTREQUEST_0_SHIPDISCAMT' //shipping discount
+			//'PAYMENTREQUEST_0_HANDLINGAMT' //handling
+			//'PAYMENTREQUEST_0_TAXAMT' //tax
+			
+			//'PAYMENTREQUEST_0_INVNUM' => $this->PaidObjectID //invoice number
+			//'PAYMENTREQUEST_0_TRANSACTIONID' => $this->ID //Transactino id
+			//'PAYMENTREQUEST_0_DESC' => //description
+			//'PAYMENTREQUEST_0_NOTETEXT' => //note to merchant
+			
+			//'PAYMENTREQUEST_0_PAYMENTACTION' => , //Sale, Order, or Authorization
+			//'PAYMENTREQUEST_0_PAYMENTREQUESTID'
+			
+			//return urls
 			'RETURNURL' => Director::absoluteURL(self::$returnURL,true),
-			'CANCELURL' => Director::absoluteURL(self::$cancelURL,true)
+			'CANCELURL' => Director::absoluteURL(self::$cancelURL,true),
+			//'PAYMENTREQUEST_0_NOTIFYURL' => //Instant payment notification
+			 
+			//'CALLBACK'
+			//'CALLBACKTIMEOUT'
 			
 			//TODO: add member & shipping fields ...this will pre-populate the paypal login / create account form 
-			
-			//'ADDROVERRIDE' => 1,
+			//'EMAIL' => 
 			//'PAYMENTREQUEST_0_SHIPTONAME' => $shipToName,
 			//'PAYMENTREQUEST_0_SHIPTOSTREET' => $shipToStreet,
 			//'PAYMENTREQUEST_0_SHIPTOSTREET2' => $shipToStreet2,
@@ -116,7 +161,22 @@ class PayPalExpressCheckoutPayment extends Payment{
 			//'PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE' => $shipToCountryCode,
 			//'PAYMENTREQUEST_0_SHIPTOZIP' => $shipToZip,
 			//'PAYMENTREQUEST_0_SHIPTOPHONENUM' => $phoneNum
+			
+			//shipping display
+			//'REQCONFIRMSHIPPING' //require that paypal account address be confirmed
+			'NOSHIPPING' => 1, //show shipping fields, or not 0 = show shipping, 1 = don't show shipping, 2 = use account address, if none passed
+			//'ALLOWOVERRIDE' //display only the provided address, not the one stored in paypal
+			
+			//TODO: Probably overkill, but you can even include the prices,qty,weight,tax etc for individual sale items
+					
+			//other settings
+			//'LOCALECODE' => //locale, or default to US
+			'LANDINGPAGE' => 'Billing' //can be 'Billing' or 'Login'
+
 		);
+		
+		//set design settings
+		$data = array_merge(self::$customsettings,$data);
 
 		$response = $this->apiCall('SetExpressCheckout',$data);
 		
@@ -134,14 +194,16 @@ class PayPalExpressCheckoutPayment extends Payment{
 		return $this->getPayPalURL($token);
 	}
 	
+	/**
+	 * see https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_nvp_r_DoExpressCheckoutPayment
+	 */
 	function confirmPayment(){
 		
-		$paymentType = "Sale";
-		
+				
 		$data = array(
 			'PAYERID' => $this->PayerID,
 			'TOKEN' => $this->Token,
-			'PAYMENTREQUEST_0_PAYMENTACTION' => $paymentType,
+			'PAYMENTREQUEST_0_PAYMENTACTION' => "Sale",
 			'PAYMENTREQUEST_0_AMT' => $this->Amount->Amount,
 			'PAYMENTREQUEST_0_CURRENCYCODE' => $this->Amount->Currency,
 			'IPADDRESS' => urlencode($_SERVER['SERVER_NAME'])
@@ -153,6 +215,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 			return null;
 		}
 		
+		
 		if(isset($response["PAYMENTINFO_0_TRANSACTIONID"])){
 			$this->TransactionID	= $response["PAYMENTINFO_0_TRANSACTIONID"]; 	//' Unique transaction ID of the payment. Note:  If the PaymentAction of the request was Authorization or Order, this value is your AuthorizationID for use with the Authorization & Capture APIs.
 		} 
@@ -160,23 +223,76 @@ class PayPalExpressCheckoutPayment extends Payment{
 		//$paymentType			= $response["PAYMENTTYPE"];  	//' Indicates whether the payment is instant or delayed. Possible values: l  none l  echeck l  instant 
 		//$orderTime 				= $response["ORDERTIME"];  		//' Time/date stamp of payment
 		
-		//TODO: should these be updated like this??
+		//TODO: should these be updated like this?
 		//$this->Amount->Amount	= $response["AMT"];  			//' The final amount charged, including any shipping and taxes from your Merchant Profile.
 		//$this->Amount->Currency= $response["CURRENCYCODE"];  	//' A three-character currency code for one of the currencies listed in PayPay-Supported Transactional Currencies. Default: USD. 
+		
+		//TODO: store this extra info locally?
 		//$feeAmt					= $response["FEEAMT"];  		//' PayPal fee amount charged for the transaction
 		//$settleAmt				= $response["SETTLEAMT"];  		//' Amount deposited in your PayPal account after a currency conversion.
 		//$taxAmt					= $response["TAXAMT"];  		//' Tax charged on the transaction.
 		//$exchangeRate			= $response["EXCHANGERATE"];  	//' Exchange rate if a currency conversion occurred. Relevant only if your are billing in their non-primary currency. If the customer chooses to pay with a currency other than the non-primary currency, the conversion occurs in the customer’s account.
 
-		if(isset($response["PAYMENTINFO_0_PAYMENTSTATUS"]) && strtoupper($response["PAYMENTINFO_0_PAYMENTSTATUS"]) == "COMPLETED"){
-			$this->Status = 'Success';			
+		if(isset($response["PAYMENTINFO_0_PAYMENTSTATUS"])){
+			
+			switch(strtoupper($response["PAYMENTINFO_0_PAYMENTSTATUS"])){
+				case "PROCESSED":
+				case "COMPLETED":
+					$this->Status = 'Success';
+					$this->Message = "The payment has been completed, and the funds have been added successfully transferred";
+					break;
+					
+				case "EXPIRED":
+					$this->Message = "The authorization period for this payment has been reached";
+				case "DENIED":
+					$this->Message = "Payment was denied";
+				case "REVERSED":
+				case "VOIDED":
+					$this->Message = "An authorization for this transaction has been voided.";
+				case "FAILED":
+					$this->Status = 'Failure';
+					break;
+					
+				case "CANCEL-REVERSAL": // A reversal has been canceled; for example, when you win a dispute and the funds for the reversal have been returned to you.
+				case "IN-PROGRESS":
+					$this->Message = "The transaction has not terminated";//, e.g. an authorization may be awaiting completion.";
+				case "PARTIALLY-REFUNDED":
+					$this->Message = "The payment has been partially refunded.";
+				case "PENDING":
+					$this->Message = "The payment is pending.";
+					if(isset($response["PAYMENTINFO_0_PENDINGREASON"])){
+						$this->Message .= " ".$this->getPendingReason($response["PAYMENTINFO_0_PENDINGREASON"]);
+					}
+				case "REFUNDED":
+					$this->Message = "Payment refunded.";
+				default:
+			}	
 		}
-		
-		//$pendingReason	= $response["PENDINGREASON"];
-		//$reasonCode		= $response["REASONCODE"];
+		//$reasonCode		= $response["REASONCODE"]; 
 		
 		$this->write();
 		
+	}
+	
+	protected function getPendingReason($reason){
+		
+		switch($reason){
+			case "address":
+				return "A confirmed shipping address was not provided.";
+			case "authorization":
+				return "Payment has been authorised, but not settled.";
+			case "echeck":
+				return "eCheck has not cleared.";
+			case "intl":
+				return "International: must be accepted or denied manually.";
+			case "multi-currency":
+				return "Multi-currency: must be accepted or denied manually.";
+			case "order":
+			case "paymentreview":
+			case "unilateral":
+			case "verify":
+			case "other":
+		}
 	}
 	
 	/**
