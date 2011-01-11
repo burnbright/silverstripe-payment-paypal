@@ -6,14 +6,16 @@
  * You will need a PayPal sandbox account, along with merchant and customer test accounts,
  * which can be set up by following this guide:
  * https://developer.paypal.com/en_US/pdf/PP_Sandbox_UserGuide.pdf
+ *
  * 
  * Integration guide for development:
  * https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_ExpressCheckout_IntegrationGuide.pdf
  * 
  * API reference: https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/howto_api_reference
  * 
- * ..add testing info
- * ..url parameters
+ * Notes / Troubleshooting:
+ * you must be logged into sandbox to process a test payment.
+ * a payment currency must match the currency of the paypal merchant account, or the payment will be set to 'pending'.
  * 
  */
 
@@ -101,8 +103,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 			'PAYMENTREQUEST_0_CURRENCYCODE' => $currencyCodeType, //TODO: check to be sure all currency codes match the SS ones
 			'PAYMENTREQUEST_0_PAYMENTACTION' => $paymentType,
 			'RETURNURL' => Director::absoluteURL(self::$returnURL,true),
-			'CANCELURL' => Director::absoluteURL(self::$cancelURL,true),
-			'useraction' => 'commit' //prevents confirmation screen at the end
+			'CANCELURL' => Director::absoluteURL(self::$cancelURL,true)
 			
 			//TODO: add member & shipping fields ...this will pre-populate the paypal login / create account form 
 			
@@ -230,7 +231,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 	
 	protected function getPayPalURL($token){
 		$url = (self::$test_mode) ? self::$test_PAYPAL_URL : self::$PAYPAL_URL;
-		return $url.$token;
+		return $url.$token.'&useraction=commit'; //useraction=commit ensures the payment is confirmed on PayPal, and not on a merchant confirm page.
 	}
 	
 	
