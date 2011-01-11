@@ -241,30 +241,41 @@ class PayPalExpressCheckoutPayment extends Payment{
 					$this->Status = 'Success';
 					$this->Message = "The payment has been completed, and the funds have been added successfully transferred";
 					break;
-					
 				case "EXPIRED":
 					$this->Message = "The authorization period for this payment has been reached";
+					$this->Status = 'Failure';
+					break;	
 				case "DENIED":
 					$this->Message = "Payment was denied";
+					$this->Status = 'Failure';
+					break;	
 				case "REVERSED":
+					$this->Status = 'Failure';
+					break;	
 				case "VOIDED":
 					$this->Message = "An authorization for this transaction has been voided.";
+					$this->Status = 'Failure';
+					break;	
 				case "FAILED":
 					$this->Status = 'Failure';
-					break;
-					
+					break;					
 				case "CANCEL-REVERSAL": // A reversal has been canceled; for example, when you win a dispute and the funds for the reversal have been returned to you.
+					break;
 				case "IN-PROGRESS":
 					$this->Message = "The transaction has not terminated";//, e.g. an authorization may be awaiting completion.";
+					break;
 				case "PARTIALLY-REFUNDED":
 					$this->Message = "The payment has been partially refunded.";
+					break;
 				case "PENDING":
 					$this->Message = "The payment is pending.";
 					if(isset($response["PAYMENTINFO_0_PENDINGREASON"])){
 						$this->Message .= " ".$this->getPendingReason($response["PAYMENTINFO_0_PENDINGREASON"]);
 					}
+					break;
 				case "REFUNDED":
 					$this->Message = "Payment refunded.";
+					break;	
 				default:
 			}	
 		}
