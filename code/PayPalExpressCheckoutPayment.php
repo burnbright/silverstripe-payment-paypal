@@ -3,13 +3,22 @@
  * PayPal Express Checkout Payment
  * @author Jeremy Shipman jeremy [at] burnbright.co.nz
  * 
+ * Testing setup:
  * You will need a PayPal sandbox account, along with merchant and customer test accounts,
  * which can be set up by following this guide:
  * https://developer.paypal.com/en_US/pdf/PP_Sandbox_UserGuide.pdf
  * 
+ * How to set up:
+ * -Set up a paypal merchant account
+ * -Log in
+ * -Visit 'My Account' > 'Profile'
+ * -Click 'API Access' link (listed under Account Information)
+ * -Click option 2 : 'Request API credentials'
+ * -Choose 'Request API signature', and click 'Agree and Submit'
+ * -Enter these details into your mysite/_config.php file with either the set_config_details or set_test_config_details functions
+ * 
  * Notes / Troubleshooting:
- * you must be logged into sandbox to process a test payment.
- * a payment currency must match the currency of the paypal merchant account, or the payment will be set to 'pending'.
+ * -you must be logged into sandbox to process a test payment.
  * 
  * Developer documentation:
  * Integration guide: https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_ExpressCheckout_IntegrationGuide.pdf
