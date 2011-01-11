@@ -17,8 +17,6 @@
  * 
  */
 
-//TODO: allow customising colours, and locale
-
 class PayPalExpressCheckoutPayment extends Payment{
 	
 	static $db = array(
