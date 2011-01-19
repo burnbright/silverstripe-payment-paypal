@@ -260,7 +260,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 				case "PROCESSED":
 				case "COMPLETED":
 					$this->Status = 'Success';
-					$this->Message = "The payment has been completed, and the funds have been added successfully transferred";
+					$this->Message = "The payment has been completed, and the funds have been successfully transferred";
 					break;
 				case "EXPIRED":
 					$this->Message = "The authorization period for this payment has been reached";
