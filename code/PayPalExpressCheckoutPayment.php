@@ -3,23 +3,6 @@
  * PayPal Express Checkout Payment
  * @author Jeremy Shipman jeremy [at] burnbright.co.nz
  * 
- * Testing setup:
- * You will need a PayPal sandbox account, along with merchant and customer test accounts,
- * which can be set up by following this guide:
- * https://developer.paypal.com/en_US/pdf/PP_Sandbox_UserGuide.pdf
- * 
- * How to set up:
- * -Set up a paypal merchant account
- * -Log in
- * -Visit 'My Account' > 'Profile'
- * -Click 'API Access' link (listed under Account Information)
- * -Click option 2 : 'Request API credentials'
- * -Choose 'Request API signature', and click 'Agree and Submit'
- * -Enter these details into your mysite/_config.php file with either the set_config_details or set_test_config_details functions
- * 
- * Notes / Troubleshooting:
- * -you must be logged into sandbox to process a test payment.
- * 
  * Developer documentation:
  * Integration guide: https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_ExpressCheckout_IntegrationGuide.pdf
  * API reference: 	  https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/howto_api_reference
@@ -74,20 +57,12 @@ class PayPalExpressCheckoutPayment extends Payment{
 		//'NOSHIPPING' => 1 //disable showing shipping details
 	);
 	
-	static function set_test_config_details($username,$password,$signature,$sbncode = null){
+	static function set_config_details($username,$password,$signature,$sbncode = null,$testmode = true){
 		self::$API_UserName = $username;
 		self::$API_Password = $password;
 		self::$API_Signature = $signature;
 		self::$sBNCode = $sbncode;
-		self::$test_mode = true;
-	}
-	
-	static function set_config_details($username,$password,$signature,$sbncode = null){
-		self::$API_UserName = $username;
-		self::$API_Password = $password;
-		self::$API_Signature = $signature;
-		self::$sBNCode = $sbncode;
-		self::$test_mode = false;
+		self::$test_mode = $testmode;
 	}
 	
 	static function set_custom_settings(array $design){
