@@ -57,11 +57,11 @@ class PayPalExpressCheckoutPayment extends Payment{
 		//'NOSHIPPING' => 1 //disable showing shipping details
 	);
 	
-	static function set_config_details($username,$password,$signature,$sbncode = null,$testmode = true){
+	static function set_config_details($username,$password,$signature,$testmode = true){
 		self::$API_UserName = $username;
 		self::$API_Password = $password;
 		self::$API_Signature = $signature;
-		self::$sBNCode = $sbncode;
+		//self::$sBNCode = $sbncode;
 		self::$test_mode = $testmode;
 	}
 	
