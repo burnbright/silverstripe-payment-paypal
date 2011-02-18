@@ -87,7 +87,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 			return new Payment_Processing();
 		}
 		
-		$this->Message = "PayPal could not be contacted";
+		$this->Message = _t('PayPalPayment.COULDNOTBECONTACTED',"PayPal could not be contacted");
 		$this->Status = 'Failure';
 		$this->write();
 		
@@ -235,21 +235,21 @@ class PayPalExpressCheckoutPayment extends Payment{
 				case "PROCESSED":
 				case "COMPLETED":
 					$this->Status = 'Success';
-					$this->Message = "The payment has been completed, and the funds have been successfully transferred";
+					$this->Message = _t('PayPalPayment.SUCCESS',"The payment has been completed, and the funds have been successfully transferred");
 					break;
 				case "EXPIRED":
-					$this->Message = "The authorization period for this payment has been reached";
+					$this->Message = _t('PayPalPayment.AUTHORISATION',"The authorization period for this payment has been reached");
 					$this->Status = 'Failure';
 					break;	
 				case "DENIED":
-					$this->Message = "Payment was denied";
+					$this->Message = _t('PayPalPayment.FAILURE',"Payment was denied");
 					$this->Status = 'Failure';
 					break;	
 				case "REVERSED":
 					$this->Status = 'Failure';
 					break;	
 				case "VOIDED":
-					$this->Message = "An authorization for this transaction has been voided.";
+					$this->Message = _t('PayPalPayment.VOIDED',"An authorization for this transaction has been voided.");
 					$this->Status = 'Failure';
 					break;	
 				case "FAILED":
@@ -258,19 +258,19 @@ class PayPalExpressCheckoutPayment extends Payment{
 				case "CANCEL-REVERSAL": // A reversal has been canceled; for example, when you win a dispute and the funds for the reversal have been returned to you.
 					break;
 				case "IN-PROGRESS":
-					$this->Message = "The transaction has not terminated";//, e.g. an authorization may be awaiting completion.";
+					$this->Message = _t('PayPalPayment.INPROGRESS',"The transaction has not terminated");//, e.g. an authorization may be awaiting completion.";
 					break;
 				case "PARTIALLY-REFUNDED":
-					$this->Message = "The payment has been partially refunded.";
+					$this->Message = _t('PayPalPayment.PARTIALLYREFUNDED',"The payment has been partially refunded.");
 					break;
 				case "PENDING":
-					$this->Message = "The payment is pending.";
+					$this->Message = _t('PayPalPayment.PENDING',"The payment is pending.");
 					if(isset($response["PAYMENTINFO_0_PENDINGREASON"])){
 						$this->Message .= " ".$this->getPendingReason($response["PAYMENTINFO_0_PENDINGREASON"]);
 					}
 					break;
 				case "REFUNDED":
-					$this->Message = "Payment refunded.";
+					$this->Message = _t('PayPalPayment.REFUNDED',"Payment refunded.");
 					break;	
 				default:
 			}	
@@ -285,15 +285,15 @@ class PayPalExpressCheckoutPayment extends Payment{
 		
 		switch($reason){
 			case "address":
-				return "A confirmed shipping address was not provided.";
+				return _t('PayPalPayment.PENDING.ADDRESS',"A confirmed shipping address was not provided.");
 			case "authorization":
-				return "Payment has been authorised, but not settled.";
+				return _t('PayPalPayment.PENDING.AUTHORISATION',"Payment has been authorised, but not settled.");
 			case "echeck":
-				return "eCheck has not cleared.";
+				return _t('PayPalPayment.PENDING.ECHECK',"eCheck has not cleared.");
 			case "intl":
-				return "International: payment must be accepted or denied manually.";
+				return _t('PayPalPayment.PENDING.INTERNATIONAL',"International: payment must be accepted or denied manually.");
 			case "multicurrency":
-				return "Multi-currency: payment must be accepted or denied manually.";
+				return _t('PayPalPayment.PENDING.MULTICURRENCY',"Multi-currency: payment must be accepted or denied manually.");
 			case "order":
 			case "paymentreview":
 			case "unilateral":
@@ -359,8 +359,8 @@ class PayPalExpressCheckoutPayment extends Payment{
 	
 	
 	function getPaymentFormFields() {
-		$logo = '<img src="' . self::$logo . '" alt="Credit card payments powered by PayPal"/>';
-		$privacyLink = '<a href="' . self::$privacy_link . '" target="_blank" title="Read PayPal\'s privacy policy">' . $logo . '</a><br/>';
+		$logo = '<img src="' . self::$logo . '" alt="'._t('PayPalPayment.POWEREDBY',"Credit card payments powered by PayPal").'"/>';
+		$privacyLink = '<a href="' . self::$privacy_link . '" target="_blank" title="'._t('PayPalPayment.READPRIVACY',"Read PayPal's privacy policy").'">' . $logo . '</a><br/>';
 		return new FieldSet(
 			new LiteralField('PayPalInfo', $privacyLink),
 			new LiteralField(
@@ -431,7 +431,7 @@ class PaypalExpressCheckoutaPayment_Handler extends Controller{
 			//TODO: do API call to gather further information
 			
 			$payment->Status = "Failure";
-			$payment->Message = "User cancelled";
+			$payment->Message = _t('PayPalPayment.USERCANCELLED',"User cancelled");
 			$payment->write();
 		}
 		
