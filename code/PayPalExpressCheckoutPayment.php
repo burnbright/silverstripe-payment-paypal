@@ -180,7 +180,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 		
 		if(!isset($response['ACK']) ||  !(strtoupper($response['ACK']) == "SUCCESS" || strtoupper($response['ACK']) == "SUCCESSWITHWARNING")){
 			
-			$mode = (self::$test_mode) ? "test" : "live";
+			$mode = (self::$test_mode === true) ? "test" : "live";
 			
 			$debugmessage = "PayPal Debug:" .
 					"\nMode: $mode".
@@ -363,11 +363,11 @@ class PayPalExpressCheckoutPayment extends Payment{
 	}
 	
 	protected function getApiEndpoint(){
-		return (self::$test_mode) ? self::$test_API_Endpoint : self::$API_Endpoint;
+		return (self::$test_mode === true) ? self::$test_API_Endpoint : self::$API_Endpoint;
 	}
 	
 	protected function getPayPalURL($token){
-		$url = (self::$test_mode) ? self::$test_PAYPAL_URL : self::$PAYPAL_URL;
+		$url = (self::$test_mode === true) ? self::$test_PAYPAL_URL : self::$PAYPAL_URL;
 		return $url.$token.'&useraction=commit'; //useraction=commit ensures the payment is confirmed on PayPal, and not on a merchant confirm page.
 	}
 	
