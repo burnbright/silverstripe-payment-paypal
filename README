@@ -22,7 +22,10 @@ Add the following to your mysite/_config.php, and populate values with the appro
 
 
 if(Director::isDev() || Director::isTest()){
-	PayPalExpressCheckoutPayment::set_config_details("TestPaypalAPIUsername","TestPaypalAPIPassword","TestPaypalSignature",null,true);
+	PayPalExpressCheckoutPayment::set_config_details("TestPaypalAPIUsername","TestPaypalAPIPassword","TestPaypalSignature",true);
 }elseif(Director::isLive()){
-	PayPalExpressCheckoutPayment::set_config_details("PaypalAPIUsername","PaypalAPIPassword","PaypalSignature",null,false);
+	PayPalExpressCheckoutPayment::set_config_details("PaypalAPIUsername","PaypalAPIPassword","PaypalSignature",false);
 }
+
+Troubleshooting:
+If you get the message "PayPal could not be contacted" , check your debug.log file, found in the root of your site. This will contain debugging information.

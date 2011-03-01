@@ -185,7 +185,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 			$debugmessage = "PayPal Debug:" .
 					"\nMode: $mode".
 					"\nAPI url: ".$this->getApiEndpoint().
-					"\nRedirect url:".$this->getPayPalURL("TOKENGOESHERE").
+					"\nRedirect url: ".$this->getPayPalURL("TOKENGOESHERE").
 					"\nUsername: " .self::$API_UserName.
 					"\nPassword: " .self::$API_Password.
 					"\nSignature: ".self::$API_Signature.
