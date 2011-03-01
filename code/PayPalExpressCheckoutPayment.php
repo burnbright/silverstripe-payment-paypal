@@ -181,7 +181,9 @@ class PayPalExpressCheckoutPayment extends Payment{
 		if(!isset($response['ACK']) ||  !(strtoupper($response['ACK']) == "SUCCESS" || strtoupper($response['ACK']) == "SUCCESSWITHWARNING")){
 			
 			$debugmessage = "PayPal Debug:" .
+					"\nMode: " . (self::$test_mode) ? "test" : "live".
 					"\nAPI url: ".$this->getApiEndpoint().
+					"\nRedirect url:".$this->getPayPalURL("TOKENGOESHERE").
 					"\nUsername: " .self::$API_UserName.
 					"\nPassword: " .self::$API_Password.
 					"\nSignature: ".self::$API_Signature.
