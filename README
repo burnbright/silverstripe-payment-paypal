@@ -6,7 +6,7 @@ You will need a PayPal sandbox account, along with merchant and customer test ac
 which can be set up by following this guide:
 https://developer.paypal.com/en_US/pdf/PP_Sandbox_UserGuide.pdf
 
-How to set up:
+How to set up your paypal account:
 -Set up a paypal merchant account
 -Log in
 -Visit 'My Account' > 'Profile'
