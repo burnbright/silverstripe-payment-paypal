@@ -65,6 +65,14 @@ class PayPalExpressCheckoutPayment extends Payment{
 		self::$test_mode = $testmode;
 	}
 	
+	static function set_live_config($username,$password,$signature){
+		self::set_config_details($username,$password,$signature,false);
+	}
+	
+	static function set_test_config($username,$password,$signature){
+		self::set_config_details($username,$password,$signature,true);
+	}
+	
 	static function set_custom_settings(array $design){
 		self::$customsettings = array_merge(self::$customsettings,$design);
 	}
