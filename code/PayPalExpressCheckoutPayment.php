@@ -105,7 +105,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 			//'PAYMENTREQUEST_0_HANDLINGAMT' //handling
 			//'PAYMENTREQUEST_0_TAXAMT' //tax
 			//'PAYMENTREQUEST_0_INVNUM' => $this->PaidObjectID //invoice number
-			//'PAYMENTREQUEST_0_TRANSACTIONID' => $this->ID //Transactino id
+			'PAYMENTREQUEST_0_TRANSACTIONID' => $this->ID, //Transactino id
 			//'PAYMENTREQUEST_0_DESC' => //description
 			//'PAYMENTREQUEST_0_NOTETEXT' => //note to merchant
 			//'PAYMENTREQUEST_0_PAYMENTACTION' => , //Sale, Order, or Authorization
@@ -125,6 +125,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 			//'LOCALECODE' => //locale, or default to US
 			'LANDINGPAGE' => 'Billing' //can be 'Billing' or 'Login'
 		);
+		
 		if(!isset($extradata['Name'])){
 			$arr =  array();
 			if(isset($extradata['FirstName'])) $arr[] = $extradata['FirstName'];
@@ -132,7 +133,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 			if(isset($extradata['Surname'])) $arr[] = $extradata['Surname'];
 			$extradata['Name'] = implode(' ',$arr);
 		}
-		//add member & shipping fields ...this will pre-populate the paypal login / create account form
+		//add member & shipping fields, etc ...this will pre-populate the paypal login / create account form
 		foreach(array(
 			'Email' => 'EMAIL',
 			'Name' => 'PAYMENTREQUEST_0_SHIPTONAME',
@@ -142,12 +143,16 @@ class PayPalExpressCheckoutPayment extends Payment{
 			'State' => 'PAYMENTREQUEST_0_SHIPTOSTATE',
 			'PostalCode' => 'PAYMENTREQUEST_0_SHIPTOZIP',
 			'HomePhone' => 'PAYMENTREQUEST_0_SHIPTOPHONENUM',
-			'Country' => 'PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'
+			'Country' => 'PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE',
+			
+			'Reference' => 'PAYMENTREQUEST_0_DESC'
 		) as $field => $val){
 			if(isset($extradata[$field])){
 				$data[$val] = $extradata[$field];
-			}			
-		}
+			}elseif($this->$field){
+				$data[$val] = $this->$field;
+			}
+		}		
 		//set design settings
 		$data = array_merge(self::$customsettings,$data);
 		$response = $this->apiCall('SetExpressCheckout',$data);
