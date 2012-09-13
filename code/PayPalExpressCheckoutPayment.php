@@ -105,7 +105,7 @@ class PayPalExpressCheckoutPayment extends Payment{
 			//'PAYMENTREQUEST_0_HANDLINGAMT' //handling
 			//'PAYMENTREQUEST_0_TAXAMT' //tax
 			//'PAYMENTREQUEST_0_INVNUM' => $this->PaidObjectID //invoice number
-			'PAYMENTREQUEST_0_TRANSACTIONID' => $this->ID, //Transactino id
+			//'PAYMENTREQUEST_0_TRANSACTIONID' //Transaction id
 			//'PAYMENTREQUEST_0_DESC' => //description
 			//'PAYMENTREQUEST_0_NOTETEXT' => //note to merchant
 			//'PAYMENTREQUEST_0_PAYMENTACTION' => , //Sale, Order, or Authorization
