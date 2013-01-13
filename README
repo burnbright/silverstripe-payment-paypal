@@ -27,6 +27,12 @@ Add the following to your mysite/_config.php, and populate values with the appro
 
 ## Troubleshooting
 
- * If you get the message "PayPal could not be contacted" , check your debug.log file, found in the root of your site.
- This will contain debugging information.
+ * If you get the message "PayPal could not be contacted" , check your debug logs. This will contain debugging
+information. Note that you need to enable debug logging. You can add debug file logging by adding the following
+to your _config.php file:
+
+```php
+	SS_Log::add_writer(new SS_LogFileWriter(Director::baseFolder().'/errors.log'), SS_Log::ERR);
+```
+
  * you must be logged into sandbox to process a test payment.
