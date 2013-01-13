@@ -19,11 +19,13 @@ How to set up your paypal account:
 
 Add the following to your mysite/_config.php, and populate values with the appropriate information from your Paypal account:
 
-		if(Director::isDev() || Director::isTest()){
-			PayPalExpressCheckoutPayment::set_test_config("TestPaypalAPIUsername","TestPaypalAPIPassword","TestPaypalSignature");
-		}elseif(Director::isLive()){
-			PayPalExpressCheckoutPayment::set_live_config("PaypalAPIUsername","PaypalAPIPassword","PaypalSignature");
-		}
+```php
+	if(Director::isDev() || Director::isTest()){
+		PayPalExpressCheckoutPayment::set_test_config("TestPaypalAPIUsername","TestPaypalAPIPassword","TestPaypalSignature");
+	}elseif(Director::isLive()){
+		PayPalExpressCheckoutPayment::set_live_config("PaypalAPIUsername","PaypalAPIPassword","PaypalSignature");
+	}
+```
 
 ## Troubleshooting
 
