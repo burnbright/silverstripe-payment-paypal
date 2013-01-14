@@ -6,6 +6,8 @@
  * Developer documentation:
  * Integration guide: https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_ExpressCheckout_IntegrationGuide.pdf
  * API reference: 	  https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/howto_api_reference
+ * Uses the Name-Value Pair API protocol
+ * 
  */
 class PayPalExpressCheckoutPayment extends Payment{
 	
@@ -165,7 +167,8 @@ class PayPalExpressCheckoutPayment extends Payment{
 					"\nUsername: " .self::$API_UserName.
 					"\nPassword: " .self::$API_Password.
 					"\nSignature: ".self::$API_Signature.
-					"\nResponse ".print_r($response,true);
+					"\nResponse: ".print_r($response,true).
+					"\nRequest Data: ".print_r($data,true);
 			Debug::log($debugmessage);
 			return null;
 		}
