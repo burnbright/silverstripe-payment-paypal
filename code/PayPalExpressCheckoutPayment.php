@@ -167,8 +167,8 @@ class PayPalExpressCheckoutPayment extends Payment{
 					"\nUsername: " .self::$API_UserName.
 					"\nPassword: " .self::$API_Password.
 					"\nSignature: ".self::$API_Signature.
-					"\nResponse: ".print_r($response,true).
-					"\nRequest Data: ".print_r($data,true);
+					"\nRequest Data: ".print_r($data,true).
+					"\nResponse: ".print_r($response,true);
 			Debug::log($debugmessage);
 			return null;
 		}
