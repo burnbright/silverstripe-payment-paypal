@@ -37,4 +37,4 @@ to your _config.php file:
 	SS_Log::add_writer(new SS_LogFileWriter(Director::baseFolder().'/errors.log'), SS_Log::ERR);
 ```
 
- * you must be logged into sandbox to process a test payment.
+ * you must be logged into the paypal developer site to process a test payment: https://developer.paypal.com/
